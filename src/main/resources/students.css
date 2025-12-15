@@ -1,0 +1,199 @@
+/* ================= ROOT ================= */
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "Arial";
+    -fx-background-color: linear-gradient(to bottom right, #f5f9ff, #eef4ff);
+}
+
+/* ================= LABELS ================= */
+.label {
+    -fx-text-fill: #1f3a5f;
+}
+
+.label:text {
+    -fx-font-weight: bold;
+}
+
+/* Title */
+.label {
+    -fx-font-size: 16px;
+}
+
+.label:first-child {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+/* ================= BUTTONS ================= */
+.button {
+    -fx-background-color: linear-gradient(to right, #2f80ed, #56ccf2);
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to right, #2563eb, #3fa9f5);
+}
+
+.button:pressed {
+    -fx-background-color: #1d4ed8;
+}
+
+/* Cancel button (slightly different tone) */
+#cancelBtn {
+    -fx-background-color: linear-gradient(to right, #94a3b8, #64748b);
+}
+
+#deleteBtn {
+    -fx-background-color: linear-gradient(to right, #e70e0e, #d74f20);
+}
+#editBtn{
+    -fx-background-color: linear-gradient(to right, #149b2a, #149b2a);
+}
+
+/* ================= TEXT FIELD ================= */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #c7d2fe;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+}
+
+/* ================= COMBO BOX ================= */
+.combo-box {
+    -fx-background-color: #3b82f6;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: transparent;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Arrow */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: white;
+}
+
+/* Hover & focus */
+.combo-box:hover,
+.combo-box:focused {
+    -fx-background-color: #2563eb;
+}
+
+/* ================= DISPLAYED VALUE ================= */
+
+/* Selected item text */
+.combo-box .list-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+
+/* Prompt text (when value == null) */
+.combo-box .list-cell:empty {
+    -fx-text-fill: #dbeafe;
+    -fx-background-color: transparent;
+}
+
+/* ================= DROPDOWN LIST ================= */
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #bfdbfe;
+    -fx-padding: 4;
+}
+
+/* Items */
+.combo-box-popup .list-cell {
+    -fx-text-fill: #1e3a8a;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12;
+}
+
+/* Hover */
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+/* Selected item in popup */
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #bfdbfe;
+    -fx-text-fill: #1e3a8a;
+}
+
+
+/* ================= TABLE VIEW ================= */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #dbeafe;
+    -fx-padding: 5;
+}
+
+/* Column headers */
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to right, #2563eb, #3b82f6);
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Rows */
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #eef2ff transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8fbff;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #bfdbfe;
+}
+
+/* Table text */
+.table-cell {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 13px;
+}
+
+/* ================= SCROLL BAR ================= */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #93c5fd;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #60a5fa;
+}

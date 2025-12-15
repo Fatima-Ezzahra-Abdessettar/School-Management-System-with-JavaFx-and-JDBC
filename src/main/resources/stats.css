@@ -1,0 +1,16 @@
+/* ===== BAR CHART ===== */
+
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-plot-background {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+}
+
+/* Bars — ONLY bar-fill */
+.chart-bar {
+    -fx-bar-fill: #4f46e5;
+    -fx-background-radius: 8 8 0 0;
+}

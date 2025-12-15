@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="403.0" prefWidth="567.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.LoginController">
+    <left>
+        <AnchorPane prefHeight="407.0" prefWidth="235.0" BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="403.0" fitWidth="235.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@images/graduation-celebration-with-balloons-confetti.jpg" />
+                    </image>
+                </ImageView>
+            </children>
+        </AnchorPane>
+    </left>
+    <right>
+        <AnchorPane prefHeight="400.0" prefWidth="332.0" BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="74.0" fitWidth="78.0" layoutX="129.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@images/login_1000946.png" />
+                    </image>
+                </ImageView>
+                <Label layoutX="36.0" layoutY="155.0" text="Username" textFill="#4ab0fe">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <TextField fx:id="usernameField" layoutX="129.0" layoutY="156.0" promptText="username" />
+                <Label layoutX="36.0" layoutY="215.0" text="Password" textFill="#4ab0fe">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <!-- Changed from TextField to PasswordField -->
+                <PasswordField fx:id="passwordField" layoutX="129.0" layoutY="216.0" promptText="........" />
+                <Button fx:id="loginBtn" layoutX="36.0" layoutY="292.0" mnemonicParsing="false" onAction="#Handlelogin" prefHeight="34.0" prefWidth="244.0" style="-fx-background-color: #4AB0FE;" text="log in" textFill="WHITE">
+                    <font>
+                        <Font name="Leelawadee UI Bold" size="18.0" />
+                    </font>
+                </Button>
+                <!-- Error message hidden by default -->
+                <Label fx:id="ErrMsg" alignment="CENTER" contentDisplay="CENTER" layoutY="255.0" prefHeight="27.0" prefWidth="332.0" text="Invalid credentials, please try again!" textFill="#ff8370" visible="false">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+            </children>
+        </AnchorPane>
+    </right>
+</BorderPane>

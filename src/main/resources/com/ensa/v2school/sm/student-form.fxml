@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ensa.v2school.sm.Controllers.StudentFormController"
+            stylesheets="@/student-form.css">
+
+    <VBox spacing="16"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <Label text="Student Form" styleClass="title"/>
+
+        <GridPane hgap="10" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="100"/>
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="ID:"/>
+            <TextField fx:id="idField" GridPane.columnIndex="1"/>
+
+            <Label text="First Name:" GridPane.rowIndex="1"/>
+            <TextField fx:id="firstNameField"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="1"/>
+
+            <Label text="Last Name:" GridPane.rowIndex="2"/>
+            <TextField fx:id="lastNameField"
+                       GridPane.rowIndex="2"
+                       GridPane.columnIndex="1"/>
+
+            <Label text="Major:" GridPane.rowIndex="3"/>
+            <ComboBox fx:id="majorBox"
+                      GridPane.rowIndex="3"
+                      GridPane.columnIndex="1"/>
+
+            <Label text="Average:" GridPane.rowIndex="4"/>
+            <TextField fx:id="averageField"
+                       GridPane.rowIndex="4"
+                       GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel"
+                    onAction="#handleCancel"
+                    styleClass="btn-secondary"/>
+            <Button text="Save"
+                    onAction="#handleSave"
+                    styleClass="btn-primary"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

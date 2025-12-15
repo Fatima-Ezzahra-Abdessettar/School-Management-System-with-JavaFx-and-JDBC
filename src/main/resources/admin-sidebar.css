@@ -1,0 +1,41 @@
+/* ================= SIDEBAR ================= */
+#sideBar {
+    -fx-background-color: linear-gradient(to bottom, #2563eb, #3b82f6);
+}
+
+/* ================= BASE BUTTON ================= */
+#sideBar .button {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: #f1f5ff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+
+    -fx-padding: 8 12 8 16;
+    -fx-pref-width: 120;
+    -fx-background-radius: 10;
+
+    -fx-cursor: hand;
+}
+
+/* Hover */
+#sideBar .button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Pressed */
+#sideBar .button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ================= ACTIVE BUTTON ================= */
+
+/* Active hover (optional) */
+.sidebar-active:hover {
+    -fx-background-color: #f1f5ff;
+}
+/* ACTIVE BUTTON */
+#sideBar .button.sidebar-active {
+    -fx-background-color: white;
+    -fx-text-fill: #3b5fa3;
+}

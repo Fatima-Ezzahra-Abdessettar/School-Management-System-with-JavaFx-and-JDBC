@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ensa.v2school.sm.Controllers.StatsController"
+            prefHeight="402.0" prefWidth="514.0"
+            stylesheets="@/stats.css">
+
+    <VBox spacing="20"
+          AnchorPane.topAnchor="20"
+          AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20">
+
+        <!-- TITLE -->
+        <Label text="Dashboard"
+               style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+        <!-- STAT CARDS -->
+        <HBox spacing="15">
+
+            <VBox prefWidth="160"
+                  style="-fx-padding: 15; -fx-background-color: #e3f2fd; -fx-background-radius: 8;">
+                <Label text="Students"/>
+                <Label fx:id="studentsCountLbl"
+                       text="0"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox prefWidth="160"
+                  style="-fx-padding: 15; -fx-background-color: #e8f5e9; -fx-background-radius: 8;">
+                <Label text="Majors"/>
+                <Label fx:id="majorsCountLbl"
+                       text="0"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox prefWidth="160"
+                  style="-fx-padding: 15; -fx-background-color: #fff3e0; -fx-background-radius: 8;">
+                <Label text="Average"/>
+                <Label fx:id="avgLbl"
+                       text="0.0"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            </VBox>
+
+        </HBox>
+        <BarChart fx:id="avgPerMajorChart"
+                  prefHeight="250"
+                  animated="false"
+                  legendVisible="false">
+
+            <xAxis>
+                <CategoryAxis label="Major"/>
+            </xAxis>
+
+            <yAxis>
+                <NumberAxis label="Average"/>
+            </yAxis>
+
+        </BarChart>
+
+
+    </VBox>
+
+</AnchorPane>
