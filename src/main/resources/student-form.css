@@ -46,3 +46,47 @@
 .btn-secondary:hover {
     -fx-background-color: #d1d5db;
 }
+
+.vbox {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+}
+
+.grid-pane {
+    -fx-padding: 5 0 5 0;
+}
+
+.text-area {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d1d5db;
+    -fx-background-color: white;
+    -fx-font-size: 13px;
+}
+
+.text-area:focused {
+    -fx-border-color: #2563eb;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 6 10;
+    -fx-font-size: 13px;
+}
+
+.hbox {
+    -fx-padding: 10 0 0 0;
+}
+
+.button {
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+}
+
+.label:disabled,
+.text-field:disabled {
+    -fx-opacity: 0;
+}
+

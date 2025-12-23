@@ -2,6 +2,7 @@ package com.ensa.v2school.sm.DAO;
 
 import com.ensa.v2school.sm.Models.Major;
 import com.ensa.v2school.sm.Models.Student;
+import com.ensa.v2school.sm.Models.DossierAdministratif;
 import com.ensa.v2school.sm.utils.DataBaseConnection;
 
 import java.sql.*;
@@ -31,7 +32,7 @@ public class StudentRepository implements CRUD<Student, String> {
                 ps.setNull(4, Types.INTEGER);
             }
             ps.setFloat(5, student.getAverage());
-            ps.setInt(6, student.getMajor().getId() );
+            ps.setInt(6, student.getMajor().getId());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -49,7 +50,6 @@ public class StudentRepository implements CRUD<Student, String> {
 
     @Override
     public Student update(Student student) throws SQLException {
-        // FIXED: Changed column names to match database
         String sql = "UPDATE students SET first_name = ?, last_name = ?, user_id = ?, average = ?, major_id = ? WHERE id = ?";
 
         try (Connection con = connection.getConnection();
@@ -101,11 +101,16 @@ public class StudentRepository implements CRUD<Student, String> {
             s.first_name,
             s.last_name,
             s.average,
-            m.id   AS major_id,
-            m.name AS major_name
+            m.id AS major_id,
+            m.name AS major_name,
+            m.description AS major_description,
+            d.id AS dossier_id,
+            d.numero_inscription,
+            d.date_creation
         FROM students s
         JOIN majors m ON s.major_id = m.id
-        where s.id=?
+        LEFT JOIN dossier_administratif d ON s.id = d.eleve_id
+        WHERE s.id = ?
     """;
 
         try (Connection con = connection.getConnection();
@@ -117,16 +122,29 @@ public class StudentRepository implements CRUD<Student, String> {
             if (rs.next()) {
                 Major major = new Major(
                         rs.getInt("major_id"),
-                        rs.getString("major_name")
+                        rs.getString("major_name"),
+                        rs.getString("major_description")
                 );
-                // FIXED: Changed to snake_case column names
+
+                DossierAdministratif dossier = null;
+                if (rs.getObject("dossier_id") != null) {
+                    dossier = new DossierAdministratif(
+                            rs.getInt("dossier_id"),
+                            rs.getString("numero_inscription"),
+                            rs.getDate("date_creation").toLocalDate(),
+                            rs.getString("id"),
+                            null
+                    );
+                }
+
                 Student student = new Student(
                         rs.getString("id"),
-                        rs.getString("first_name"),    // CHANGED
-                        rs.getString("last_name"),     // CHANGED
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
                         null,
                         rs.getFloat("average"),
-                        major
+                        major,
+                        dossier
                 );
                 return Optional.of(student);
             }
@@ -146,10 +164,15 @@ public class StudentRepository implements CRUD<Student, String> {
             s.first_name,
             s.last_name,
             s.average,
-            m.id   AS major_id,
-            m.name AS major_name
+            m.id AS major_id,
+            m.name AS major_name,
+            m.description AS major_description,
+            d.id AS dossier_id,
+            d.numero_inscription,
+            d.date_creation
         FROM students s
         JOIN majors m ON s.major_id = m.id
+        LEFT JOIN dossier_administratif d ON s.id = d.eleve_id
         ORDER BY s.id ASC
     """;
 
@@ -162,8 +185,20 @@ public class StudentRepository implements CRUD<Student, String> {
             while (rs.next()) {
                 Major major = new Major(
                         rs.getInt("major_id"),
-                        rs.getString("major_name")
+                        rs.getString("major_name"),
+                        rs.getString("major_description")
                 );
+
+                DossierAdministratif dossier = null;
+                if (rs.getObject("dossier_id") != null) {
+                    dossier = new DossierAdministratif(
+                            rs.getInt("dossier_id"),
+                            rs.getString("numero_inscription"),
+                            rs.getDate("date_creation").toLocalDate(),
+                            rs.getString("id"),
+                            null
+                    );
+                }
 
                 students.add(new Student(
                         rs.getString("id"),
@@ -171,19 +206,34 @@ public class StudentRepository implements CRUD<Student, String> {
                         rs.getString("last_name"),
                         null,
                         rs.getFloat("average"),
-                        major
+                        major,
+                        dossier
                 ));
             }
         }
-        return students; // empty list = no students
+        return students;
     }
-
-
 
     // CUSTOM METHODS
 
     public Optional<Student> findByUserId(int userId) throws SQLException {
-        String sql = "SELECT * FROM students s JOIN majors m ON s.major_id = m.id WHERE user_id = ?";
+        String sql = """
+        SELECT 
+            s.id,
+            s.first_name,
+            s.last_name,
+            s.average,
+            m.id AS major_id,
+            m.name AS major_name,
+            m.description AS major_description,
+            d.id AS dossier_id,
+            d.numero_inscription,
+            d.date_creation
+        FROM students s
+        JOIN majors m ON s.major_id = m.id
+        LEFT JOIN dossier_administratif d ON s.id = d.eleve_id
+        WHERE s.user_id = ?
+    """;
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -192,18 +242,31 @@ public class StudentRepository implements CRUD<Student, String> {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                MajorRepository majorRepository = new MajorRepository();
-                int majorId = rs.getInt("major_id");
-                String majorName = rs.getString("major_name");
-                Major major = new Major(majorId,majorName);
+                Major major = new Major(
+                        rs.getInt("major_id"),
+                        rs.getString("major_name"),
+                        rs.getString("major_description")
+                );
+
+                DossierAdministratif dossier = null;
+                if (rs.getObject("dossier_id") != null) {
+                    dossier = new DossierAdministratif(
+                            rs.getInt("dossier_id"),
+                            rs.getString("numero_inscription"),
+                            rs.getDate("date_creation").toLocalDate(),
+                            rs.getString("id"),
+                            null
+                    );
+                }
+
                 Student student = new Student(
                         rs.getString("id"),
-                        rs.getString("first_name"),    // CHANGED
-                        rs.getString("last_name"),     // CHANGED
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
                         null,
                         rs.getFloat("average"),
-                        major
-
+                        major,
+                        dossier
                 );
                 return Optional.of(student);
             }
@@ -217,17 +280,21 @@ public class StudentRepository implements CRUD<Student, String> {
     }
 
     public List<Student> findByMajor(int majorId) throws SQLException {
-
         String sql = """
         SELECT 
             s.id,
             s.first_name,
             s.last_name,
             s.average,
-            m.id   AS major_id,
-            m.name AS major_name
+            m.id AS major_id,
+            m.name AS major_name,
+            m.description AS major_description,
+            d.id AS dossier_id,
+            d.numero_inscription,
+            d.date_creation
         FROM students s
         JOIN majors m ON s.major_id = m.id
+        LEFT JOIN dossier_administratif d ON s.id = d.eleve_id
         WHERE s.major_id = ?
     """;
 
@@ -242,8 +309,20 @@ public class StudentRepository implements CRUD<Student, String> {
             while (rs.next()) {
                 Major major = new Major(
                         rs.getInt("major_id"),
-                        rs.getString("major_name")
+                        rs.getString("major_name"),
+                        rs.getString("major_description")
                 );
+
+                DossierAdministratif dossier = null;
+                if (rs.getObject("dossier_id") != null) {
+                    dossier = new DossierAdministratif(
+                            rs.getInt("dossier_id"),
+                            rs.getString("numero_inscription"),
+                            rs.getDate("date_creation").toLocalDate(),
+                            rs.getString("id"),
+                            null
+                    );
+                }
 
                 Student student = new Student(
                         rs.getString("id"),
@@ -251,7 +330,8 @@ public class StudentRepository implements CRUD<Student, String> {
                         rs.getString("last_name"),
                         null,
                         rs.getFloat("average"),
-                        major
+                        major,
+                        dossier
                 );
 
                 students.add(student);
@@ -271,7 +351,6 @@ public class StudentRepository implements CRUD<Student, String> {
         if (studentOpt.isPresent()) {
             Student student = studentOpt.get();
 
-            // FIXED: Changed to snake_case
             String sql = "SELECT user_id, major_id FROM students WHERE id = ?";
             try (Connection con = connection.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
@@ -280,8 +359,8 @@ public class StudentRepository implements CRUD<Student, String> {
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    int userId = rs.getInt("user_id");      // CHANGED
-                    int majorId = rs.getInt("major_id");    // CHANGED
+                    int userId = rs.getInt("user_id");
+                    int majorId = rs.getInt("major_id");
 
                     userRepo.get(userId).ifPresent(student::setUser);
                     majorRepo.get(majorId).ifPresent(student::setMajor);
@@ -293,37 +372,37 @@ public class StudentRepository implements CRUD<Student, String> {
 
         return Optional.empty();
     }
+
     public int getCount() throws SQLException {
         String sql = "SELECT COUNT(*) FROM students";
-        try {
-            Connection con = connection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Connection con = connection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.err.println("Error getting count: " + e.getMessage());
         }
         return 0;
     }
+
     public Float getAverage() throws SQLException {
         String sql = "SELECT AVG(average) FROM students";
-        try {
-            Connection con = connection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Connection con = connection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getFloat(1);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.err.println("Error getting average: " + e.getMessage());
         }
 
         return 0f;
     }
-    public Map<String, Float> getAverageByMajor() throws SQLException {
 
+    public Map<String, Float> getAverageByMajor() throws SQLException {
         String sql = """
         SELECT m.name, AVG(s.average) AS avg_grade
         FROM students s
@@ -347,5 +426,4 @@ public class StudentRepository implements CRUD<Student, String> {
 
         return result;
     }
-
 }

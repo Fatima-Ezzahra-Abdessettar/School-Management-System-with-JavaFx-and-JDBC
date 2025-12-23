@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ensa.v2school.sm.Controllers.DossierFormController">
+
+    <VBox spacing="16"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <Label text="Dossier Administratif" style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+
+        <GridPane hgap="10" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="140"/>
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Numéro d'inscription:"/>
+            <TextField fx:id="numeroInscriptionField" GridPane.columnIndex="1" editable="false"/>
+
+            <Label text="Date de création:" GridPane.rowIndex="1"/>
+            <DatePicker fx:id="dateCreationPicker"
+                        GridPane.rowIndex="1"
+                        GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancel"/>
+            <Button text="Save" fx:id="saveBtn" onAction="#handleSave"/>
+        </HBox>
+
+    </VBox>
+</AnchorPane>

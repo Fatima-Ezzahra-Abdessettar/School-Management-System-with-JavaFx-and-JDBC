@@ -1,0 +1,142 @@
+/* Root styling */
+.root {
+    -fx-background-color: #f5f5f5;
+}
+
+/* VBox container */
+VBox {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+/* Title label */
+#majorTitleLabel {
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+}
+
+/* Info labels */
+#majorNameLabel, #majorDescLabel {
+    -fx-text-fill: #34495e;
+    -fx-padding: 5 0 5 0;
+}
+
+#majorDescLabel {
+    -fx-background-color: #ecf0f1;
+    -fx-padding: 10;
+    -fx-background-radius: 5px;
+}
+
+/* Student count label */
+#studentCountLabel {
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Table styling */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #34495e;
+}
+
+.table-view .column-header {
+    -fx-background-color: #34495e;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 10 0;
+}
+
+.table-view .table-cell {
+    -fx-padding: 8px;
+    -fx-border-color: transparent;
+    -fx-text-fill: #2c3e50;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #e3f2fd;
+    -fx-cursor: hand;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #3498db;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+/* Empty table placeholder */
+.table-view .placeholder .label {
+    -fx-text-fill: #95a5a6;
+    -fx-font-style: italic;
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}
+
+.button:pressed {
+    -fx-background-color: #21618c;
+    -fx-translate-y: 1px;
+}
+
+/* Scrollbar styling */
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5px;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #95a5a6;
+}
+
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.table-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5px;
+}
+
+.table-view .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #95a5a6;
+}
+
+/* Section headers */
+Label {
+    -fx-text-fill: #2c3e50;
+}

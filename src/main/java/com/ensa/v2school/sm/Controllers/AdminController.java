@@ -32,10 +32,17 @@ public class AdminController implements Initializable {
             AnchorPane view = fxmlLoader.load();
             centerAnchor.getChildren().clear();
             centerAnchor.getChildren().add(view);
-            AnchorPane.setTopAnchor(view,0.0);
-            AnchorPane.setLeftAnchor(view,0.0);
-            AnchorPane.setRightAnchor(view,0.0);
-            AnchorPane.setBottomAnchor(view,0.0);
+
+            // Anchor all sides to 0
+            AnchorPane.setTopAnchor(view, 0.0);
+            AnchorPane.setLeftAnchor(view, 0.0);
+            AnchorPane.setRightAnchor(view, 0.0);
+            AnchorPane.setBottomAnchor(view, 0.0);
+
+            // Bind the view's preferred width to fill the centerAnchor
+            view.prefWidthProperty().bind(centerAnchor.widthProperty());
+            view.prefHeightProperty().bind(centerAnchor.heightProperty());
+
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -46,6 +53,10 @@ public class AdminController implements Initializable {
     }
     public void handleLogout(){
         navigateTo("Login");
+    }
+    public void handleMajors(ActionEvent e){
+        setActive((Button) e.getSource());
+        loadView("Majors");
     }
     public void navigateTo(String viewName) {
         try {
@@ -72,5 +83,9 @@ public class AdminController implements Initializable {
         loadView("Students");
     }
 
-
+    @FXML
+    public void handleSubjects(ActionEvent e) {
+        setActive((Button) e.getSource());
+        loadView("subjects");
+    }
 }

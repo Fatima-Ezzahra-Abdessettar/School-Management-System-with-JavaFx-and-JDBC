@@ -18,12 +18,13 @@ public class MajorRepository implements CRUD<Major, Integer> {
 
     @Override
     public Major create(Major major) throws SQLException {
-        String sql = "INSERT INTO majors (name) VALUES (?)";
+        String sql = "INSERT INTO majors (name, description) VALUES (?, ?)";
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, major.getMajorName());
+            ps.setString(2, major.getDescription());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -44,13 +45,14 @@ public class MajorRepository implements CRUD<Major, Integer> {
     }
 
     public Major update(Major major) throws SQLException {
-        String sql = "UPDATE majors SET name = ? WHERE id = ?";
+        String sql = "UPDATE majors SET name = ?, description = ? WHERE id = ?";
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, major.getMajorName());
-            ps.setInt(2, major.getId());
+            ps.setString(2, major.getDescription());
+            ps.setInt(3, major.getId());
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0 ? major : null;
@@ -92,7 +94,8 @@ public class MajorRepository implements CRUD<Major, Integer> {
             if (rs.next()) {
                 Major major = new Major(
                         rs.getInt("id"),
-                        rs.getString("name")
+                        rs.getString("name"),
+                        rs.getString("description")
                 );
                 return Optional.of(major);
             }
@@ -117,7 +120,8 @@ public class MajorRepository implements CRUD<Major, Integer> {
             while (rs.next()) {
                 Major major = new Major(
                         rs.getInt("id"),
-                        rs.getString("name")
+                        rs.getString("name"),
+                        rs.getString("description")
                 );
                 majors.add(major);
             }
@@ -143,7 +147,8 @@ public class MajorRepository implements CRUD<Major, Integer> {
             if (rs.next()) {
                 Major major = new Major(
                         rs.getInt("id"),
-                        rs.getString("name")
+                        rs.getString("name"),
+                        rs.getString("description")
                 );
                 return Optional.of(major);
             }
@@ -155,17 +160,18 @@ public class MajorRepository implements CRUD<Major, Integer> {
 
         return Optional.empty();
     }
+
     public int getCount() throws SQLException {
         String sql = "SELECT COUNT(*) FROM majors";
-        try{
-            Connection con = connection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Connection con = connection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
-        }catch(SQLException e){
-            System.err.println("Error getting majors: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error getting majors count: " + e.getMessage());
+            throw e;
         }
         return 0;
     }

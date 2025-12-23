@@ -10,8 +10,12 @@ import javafx.scene.control.Label;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class StatsController {
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
+public class StatsController {
+    private static final DecimalFormat dfZero = new DecimalFormat("0.00");
     public BarChart avgPerMajorChart;
     @FXML
     private Label studentsCountLbl;
@@ -28,7 +32,7 @@ public class StatsController {
             Float Avg = studentRepository.getAverage();
             studentsCountLbl.setText(StudentsCount + "");
             majorsCountLbl.setText(MajorsCount + "");
-            avgLbl.setText(Avg + "/20");
+            avgLbl.setText(dfZero.format(Avg) + "/20");
             Map<String, Float> data = studentRepository.getAverageByMajor();
 
             XYChart.Series<String, Number> series = new XYChart.Series<>();

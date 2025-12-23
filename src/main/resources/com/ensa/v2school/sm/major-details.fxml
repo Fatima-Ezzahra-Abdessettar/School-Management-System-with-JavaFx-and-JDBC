@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="672.0" prefWidth="600.0" spacing="15" stylesheets="@/major-details.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.MajorDetailsController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Major Info -->
+    <Label fx:id="majorTitleLabel" text="Major Details">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+
+    <Label fx:id="majorNameLabel" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Name: " />
+    <Label fx:id="majorDescLabel" style="-fx-font-size: 12px;" text="Description: " wrapText="true" />
+
+    <!-- Subjects Section -->
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Subjects in this major:">
+        <VBox.margin>
+            <Insets top="10" />
+        </VBox.margin>
+    </Label>
+
+    <TableView fx:id="subjectsTable" prefHeight="148.0" prefWidth="572.0">
+        <columns>
+            <TableColumn fx:id="subjectIdCol" prefWidth="109.99997520446777" text="ID" />
+            <TableColumn fx:id="subjectNameCol" prefWidth="449.9999694824219" text="Subject Name" />
+        </columns>
+    </TableView>
+
+    <Label fx:id="subjectCountLabel" style="-fx-font-size: 12px; -fx-font-style: italic;" text="Total subjects: 0" />
+
+    <!-- Students Section -->
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Students in this major:">
+        <VBox.margin>
+            <Insets top="10" />
+        </VBox.margin>
+    </Label>
+
+    <TableView fx:id="studentsTable" prefHeight="154.0" prefWidth="560.0">
+        <columns>
+            <TableColumn fx:id="studentIdCol" prefWidth="120.0" text="ID" />
+            <TableColumn fx:id="firstNameCol" prefWidth="161.2000732421875" text="First Name" />
+            <TableColumn fx:id="lastNameCol" prefWidth="184.39996337890625" text="Last Name" />
+            <TableColumn fx:id="averageCol" prefWidth="93.19998168945312" text="Average" />
+        </columns>
+    </TableView>
+
+    <Label fx:id="studentCountLabel" style="-fx-font-size: 12px; -fx-font-style: italic;" text="Total students: 0" />
+
+    <Button alignment="CENTER" onAction="#handleClose" prefWidth="100" text="Close">
+        <VBox.margin>
+            <Insets top="10" />
+        </VBox.margin>
+    </Button>
+</VBox>
