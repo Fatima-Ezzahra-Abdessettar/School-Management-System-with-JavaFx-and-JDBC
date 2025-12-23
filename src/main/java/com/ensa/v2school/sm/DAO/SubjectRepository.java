@@ -81,85 +81,136 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
     @Override
     public Subject create(Subject subject) throws SQLException {
         String sql = "INSERT INTO subjects (name) VALUES (?)";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false);
 
-            ps.setString(1, subject.getName());
-            int rowsAffected = ps.executeUpdate();
+            try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, subject.getName());
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    subject.setId(keys.getInt(1));
+                if (rowsAffected > 0) {
+                    ResultSet keys = ps.getGeneratedKeys();
+                    if (keys.next()) {
+                        subject.setId(keys.getInt(1));
+                    }
+                    insertMajors(con, subject);
+                    con.commit();
+                    return subject;
                 }
-
-                insertMajors(con, subject);
-                con.commit();
-                return subject;
+                con.rollback();
+                return null;
             }
-            con.rollback();
-            return null;
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error creating subject: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 
     @Override
     public Subject update(Subject subject) throws SQLException {
         String sql = "UPDATE subjects SET name = ? WHERE id = ?";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false);
 
-            ps.setString(1, subject.getName());
-            ps.setInt(2, subject.getId());
-            int rowsAffected = ps.executeUpdate();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, subject.getName());
+                ps.setInt(2, subject.getId());
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                deleteMajors(con, subject.getId());
-                insertMajors(con, subject);
-
-                con.commit();
-                return subject;
+                if (rowsAffected > 0) {
+                    deleteMajors(con, subject.getId());
+                    insertMajors(con, subject);
+                    con.commit();
+                    return subject;
+                }
+                con.rollback();
+                return null;
             }
-            con.rollback();
-            return null;
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error updating subject: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 
     @Override
     public Subject delete(Subject subject) throws SQLException {
         String sql = "DELETE FROM subjects WHERE id = ?";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false);
 
             deleteMajors(con, subject.getId());
 
-            ps.setInt(1, subject.getId());
-            int rowsAffected = ps.executeUpdate();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, subject.getId());
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                con.commit();
-                return subject;
+                if (rowsAffected > 0) {
+                    con.commit();
+                    return subject;
+                }
+                con.rollback();
+                return null;
             }
-            con.rollback();
-            return null;
-
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error deleting subject: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 

@@ -450,21 +450,15 @@ public class StudentRepository implements CRUD<Student, String> {
 
         return result;
     }
-    /**
-     * Enrolls a student in multiple subjects (transactional)
-     * @param studentId The student ID
-     * @param subjectIds List of subject IDs to enroll in
-     * @throws SQLException if enrollment fails
-     */
     public void enrollInSubjects(String studentId, List<Integer> subjectIds) throws SQLException {
         String sql = "INSERT INTO student_subject (student_id, subject_id) VALUES (?, ?)";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try {
+            con = connection.getConnection();
+            con.setAutoCommit(false);
 
-            con.setAutoCommit(false); // Start transaction
-
-            try {
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
                 for (Integer subjectId : subjectIds) {
                     ps.setString(1, studentId);
                     ps.setInt(2, subjectId);
@@ -472,26 +466,31 @@ public class StudentRepository implements CRUD<Student, String> {
                 }
 
                 ps.executeBatch();
-                con.commit(); // Commit transaction
+                con.commit();
                 System.out.println("Successfully enrolled student " + studentId + " in " + subjectIds.size() + " subjects");
-
-            } catch (SQLException e) {
-                con.rollback(); // Rollback on error
-                System.err.println("Error enrolling student in subjects: " + e.getMessage());
-                throw e;
             }
-
         } catch (SQLException e) {
-            System.err.println("Database connection error: " + e.getMessage());
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("Error enrolling student in subjects: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 
-    /**
-     * Gets all subjects a student is enrolled in
-     * @param studentId The student ID
-     * @return List of enrolled subjects
-     */
     public List<Subject> getEnrolledSubjects(String studentId) throws SQLException {
         String sql = """
         SELECT s.id, s.name
@@ -521,20 +520,15 @@ public class StudentRepository implements CRUD<Student, String> {
         return subjects;
     }
 
-    /**
-     * Removes a student's enrollment from specific subjects
-     * @param studentId The student ID
-     * @param subjectIds List of subject IDs to unenroll from
-     */
     public void unenrollFromSubjects(String studentId, List<Integer> subjectIds) throws SQLException {
         String sql = "DELETE FROM student_subject WHERE student_id = ? AND subject_id = ?";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false);
 
-            try {
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
                 for (Integer subjectId : subjectIds) {
                     ps.setString(1, studentId);
                     ps.setInt(2, subjectId);
@@ -543,17 +537,29 @@ public class StudentRepository implements CRUD<Student, String> {
 
                 ps.executeBatch();
                 con.commit();
-
-            } catch (SQLException e) {
-                con.rollback();
-                throw e;
+            }
+        } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("Error unenrolling student from subjects: " + e.getMessage());
+            throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
             }
         }
     }
 
-    /**
-     * Checks if a student is already enrolled in a subject
-     */
     public boolean isEnrolledInSubject(String studentId, int subjectId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM student_subject WHERE student_id = ? AND subject_id = ?";
 

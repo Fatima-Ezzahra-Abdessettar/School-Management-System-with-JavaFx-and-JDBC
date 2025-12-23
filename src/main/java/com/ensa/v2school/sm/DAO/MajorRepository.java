@@ -62,92 +62,139 @@ public class MajorRepository implements CRUD<Major, Integer> {
     @Override
     public Major create(Major major) throws SQLException {
         String sql = "INSERT INTO majors (name, description) VALUES (?, ?)";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false); // Start transaction
 
-            ps.setString(1, major.getMajorName());
-            ps.setString(2, major.getDescription());
+            try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, major.getMajorName());
+                ps.setString(2, major.getDescription());
 
-            int rowsAffected = ps.executeUpdate();
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                ResultSet generatedKeys = ps.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    major.setId(generatedKeys.getInt(1));
-
-                    // Link subjects in the joining table
-                    insertMajorSubjects(con, major.getId(), major.getSubjects());
+                if (rowsAffected > 0) {
+                    ResultSet generatedKeys = ps.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        major.setId(generatedKeys.getInt(1));
+                        insertMajorSubjects(con, major.getId(), major.getSubjects());
+                    }
+                    con.commit(); // Commit transaction
+                    return major;
                 }
-                con.commit(); // Commit transaction
-                return major;
+                con.rollback(); // Rollback if creation failed
+                return null;
             }
-            con.rollback(); // Rollback if creation failed
-            return null;
-
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback(); // Rollback on error
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error creating major: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
-
+    @Override
     public Major update(Major major) throws SQLException {
         String sql = "UPDATE majors SET name = ?, description = ? WHERE id = ?";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false); // Start transaction
 
-            ps.setString(1, major.getMajorName());
-            ps.setString(2, major.getDescription());
-            ps.setInt(3, major.getId());
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, major.getMajorName());
+                ps.setString(2, major.getDescription());
+                ps.setInt(3, major.getId());
 
-            int rowsAffected = ps.executeUpdate();
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                // Update the subjects relationship
-                updateMajorSubjects(con, major.getId(), major.getSubjects());
-                con.commit(); // Commit transaction
-                return major;
+                if (rowsAffected > 0) {
+                    updateMajorSubjects(con, major.getId(), major.getSubjects());
+                    con.commit(); // Commit transaction
+                    return major;
+                }
+                con.rollback(); // Rollback if update failed
+                return null;
             }
-            con.rollback(); // Rollback if update failed
-            return null;
-
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback(); // Rollback on error
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error updating major: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true); // Restore auto-commit
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
-
     @Override
     public Major delete(Major major) throws SQLException {
         String sql = "DELETE FROM majors WHERE id = ?";
+        Connection con = null;
 
-        try (Connection con = connection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
+        try {
+            con = connection.getConnection();
             con.setAutoCommit(false); // Start transaction
 
-            // 1. Delete links in the joining table (important for foreign key constraints)
+            // 1. Delete links in the joining table
             deleteMajorSubjects(con, major.getId());
 
             // 2. Delete the major itself
-            ps.setInt(1, major.getId());
-            int rowsAffected = ps.executeUpdate();
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, major.getId());
+                int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                con.commit(); // Commit transaction
-                return major;
+                if (rowsAffected > 0) {
+                    con.commit(); // Commit transaction
+                    return major;
+                }
+                con.rollback(); // Rollback if delete failed
+                return null;
             }
-            con.rollback(); // Rollback if delete failed
-            return null;
-
         } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback(); // Rollback on error
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println("Error deleting major: " + e.getMessage());
             throw e;
+        } finally {
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true); // Restore auto-commit
+                    con.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Error closing connection: " + closeEx.getMessage());
+                }
+            }
         }
     }
 
