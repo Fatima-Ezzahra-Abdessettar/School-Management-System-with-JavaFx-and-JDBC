@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="402.0" prefWidth="703.0" stylesheets="@/students.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.StudentsController">
+<AnchorPane prefHeight="402.0" prefWidth="642.0" stylesheets="@/students.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.StudentsController">
    <children>
        <HBox alignment="CENTER_LEFT" layoutX="27" layoutY="20" spacing="15">
 
@@ -27,20 +27,20 @@
            </HBox>
        </HBox>
 
-       <TableView fx:id="TableView" layoutX="23" layoutY="114" prefHeight="288" prefWidth="652.0">
+       <TableView fx:id="TableView" layoutX="23" layoutY="114" prefHeight="288" prefWidth="592.0">
            <columns>
                <TableColumn fx:id="idCol" prefWidth="75.0" text="id" />
                <TableColumn fx:id="firstNameCol" prefWidth="121.2" text="firstName" />
                <TableColumn fx:id="lastNameCol" prefWidth="106.4" text="lastName" />
                <TableColumn fx:id="averageCol" prefWidth="83.6" text="Average" />
-               <TableColumn fx:id="MajorCol" prefWidth="126.4" text="Major" />
+               <TableColumn fx:id="MajorCol" prefWidth="102.79995727539062" text="Major" />
            </columns>
        </TableView>
       <TextField fx:id="searchId" layoutX="27.0" layoutY="71.0" prefHeight="25.0" prefWidth="170.0" promptText="search by id " />
        <HBox layoutX="203" layoutY="71" spacing="10">
-           <Button fx:id="searchBtn" onAction="#handleSearch" text="search" />
-           <Button fx:id="cancelBtn" onAction="#handleCancelSearch" text="cancel" />
-           <ComboBox fx:id="filterMajorBtn" layoutX="330.0" layoutY="71.0" onAction="#loadMajorTableView" prefHeight="30.0" prefWidth="160.0" promptText="Filter by major" />
+           <Button fx:id="searchBtn" onAction="#handleSearch" prefHeight="25.0" prefWidth="79.0" text="search" />
+           <Button fx:id="cancelBtn" onAction="#handleCancelSearch" prefHeight="25.0" prefWidth="96.0" text="cancel" />
        </HBox>
+        <ComboBox fx:id="filterMajorBtn" layoutX="395.0" layoutY="69.0" onAction="#loadMajorTableView" prefHeight="30.0" prefWidth="220.0" promptText="Filter by major" />
    </children>
 </AnchorPane>

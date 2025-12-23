@@ -5,49 +5,40 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TableCell?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="402.0" prefWidth="560.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.MajorsController" stylesheets="@/students.css">
+<AnchorPane prefHeight="402.0" prefWidth="638.0" stylesheets="@/students.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.MajorsController">
     <children>
-        <HBox layoutX="27" layoutY="20" spacing="15" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT" layoutX="27" layoutY="20" spacing="15">
             <Label text="Majors">
                 <font>
-                    <Font size="24.0"/>
+                    <Font size="24.0" />
                 </font>
             </Label>
 
             <HBox spacing="10">
-                <Button fx:id="addBtn" text="add" onAction="#handleAdd"/>
-                <Button fx:id="editBtn" text="edit" onAction="#handleEdit"/>
-                <Button fx:id="deleteBtn" text="delete" onAction="#handleDelete"/>
+                <Button fx:id="addBtn" onAction="#handleAdd" text="add" />
+                <Button fx:id="editBtn" onAction="#handleEdit" text="edit" />
+                <Button fx:id="deleteBtn" onAction="#handleDelete" text="delete" />
             </HBox>
         </HBox>
 
-        <TableView fx:id="TableView"
-                   layoutX="23"
-                   layoutY="114"
-                   prefHeight="288"
-                   prefWidth="514">
+        <TableView fx:id="TableView" layoutX="23" layoutY="114" prefHeight="288" prefWidth="603.0">
             <columns>
                 <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
                 <TableColumn fx:id="nameCol" prefWidth="150.0" text="Major Name" />
-                <TableColumn fx:id="descriptionCol" prefWidth="200.0" text="Description" />
-                <TableColumn fx:id="actionsCol" prefWidth="114.0" text="Actions" />
+                <TableColumn fx:id="descriptionCol" prefWidth="257.1999969482422" text="Description" />
+                <TableColumn fx:id="actionsCol" prefWidth="144.79998779296875" text="Actions" />
             </columns>
         </TableView>
 
-        <TextField fx:id="searchId" layoutX="27.0" layoutY="71.0" prefHeight="25.0" prefWidth="170.0" promptText="search by id" />
+        <TextField fx:id="searchId" layoutX="27.0" layoutY="71.0" prefHeight="25.0" prefWidth="230.0" promptText="search by id" />
 
-        <HBox layoutX="203" layoutY="71" spacing="10">
-            <Button fx:id="searchBtn"
-                    onAction="#handleSearch"
-                    text="search"/>
-            <Button fx:id="cancelBtn"
-                    onAction="#handleCancelSearch"
-                    text="cancel"/>
+        <HBox layoutX="274.0" layoutY="71.0" prefHeight="25.0" prefWidth="207.0" spacing="10">
+            <Button fx:id="searchBtn" onAction="#handleSearch" prefHeight="25.0" prefWidth="117.0" text="search" />
+            <Button fx:id="cancelBtn" onAction="#handleCancelSearch" prefHeight="25.0" prefWidth="116.0" text="cancel" />
         </HBox>
     </children>
 </AnchorPane>

@@ -6,23 +6,52 @@ import com.ensa.v2school.sm.Models.Major;
 import com.ensa.v2school.sm.Models.Subject;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class SubjectFormController implements Initializable {
 
     @FXML private TextField idField;
     @FXML private TextField nameField;
-    @FXML private ComboBox<Major> majorComboBox;
+    @FXML private ListView<Major> majorListView;
 
     private Subject subject;
+    private SubjectRepository subjectRepository = new SubjectRepository();
+    private MajorRepository majorRepository = new MajorRepository();
+
+    // Map to track which majors are selected
+    private Map<Major, javafx.beans.property.BooleanProperty> majorSelectionMap = new HashMap<>();
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        System.out.println("SubjectFormController initialized!");
+        System.out.println("ListView: " + (majorListView != null ? "OK" : "NULL"));
+
+        // Configure ListView with checkboxes
+        if (majorListView != null) {
+            setupCheckBoxListView();
+            loadAllMajors();
+        } else {
+            System.err.println("ERROR: majorListView is NULL!");
+        }
+    }
+
+    private void setupCheckBoxListView() {
+        majorListView.setCellFactory(CheckBoxListCell.forListView(major -> {
+            javafx.beans.property.BooleanProperty observable = new javafx.beans.property.SimpleBooleanProperty();
+            majorSelectionMap.put(major, observable);
+            return observable;
+        }));
+    }
 
     public void setSubject(Subject subject) {
         this.subject = subject;
@@ -35,7 +64,20 @@ public class SubjectFormController implements Initializable {
             idField.setManaged(true);
 
             nameField.setText(subject.getName());
-            majorComboBox.setValue(subject.getMajor());
+
+            // Select the majors already associated with the subject
+            if (subject.getMajors() != null && !subject.getMajors().isEmpty()) {
+                javafx.application.Platform.runLater(() -> {
+                    for (Major selectedMajor : subject.getMajors()) {
+                        for (Map.Entry<Major, javafx.beans.property.BooleanProperty> entry : majorSelectionMap.entrySet()) {
+                            if (entry.getKey().getId() == selectedMajor.getId()) {
+                                entry.getValue().set(true);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
         } else {
             // Adding new subject - hide ID field
             idField.setVisible(false);
@@ -45,42 +87,46 @@ public class SubjectFormController implements Initializable {
 
     @FXML
     private void handleSave() {
-
-        if (nameField.getText().isEmpty() || majorComboBox.getValue() == null) {
-            showAlert("Error", "Please fill all fields!");
+        // Validate input
+        if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
+            showAlert("Error", "Please enter a subject name!");
             return;
         }
 
-        SubjectRepository repo = new SubjectRepository();
+        // Get selected majors from checkbox map
+        List<Major> selectedMajors = new ArrayList<>();
+        for (Map.Entry<Major, javafx.beans.property.BooleanProperty> entry : majorSelectionMap.entrySet()) {
+            if (entry.getValue().get()) {
+                selectedMajors.add(entry.getKey());
+            }
+        }
+
+        if (selectedMajors.isEmpty()) {
+            showAlert("Error", "Please select at least one major!");
+            return;
+        }
 
         try {
             if (subject != null) {
                 // Update existing subject
                 subject.setName(nameField.getText().trim());
-                subject.setMajor(majorComboBox.getValue());
-                repo.update(subject);
-                showAlert("Success", "Subject modified successfully");
+                subject.setMajors(selectedMajors);
+                subjectRepository.update(subject);
+                showSuccessAlert("Subject modified successfully");
             } else {
                 // Create new subject
                 subject = new Subject();
                 subject.setName(nameField.getText().trim());
-                subject.setMajor(majorComboBox.getValue());
-                repo.create(subject);
-                showAlert("Success", "Subject created successfully");
+                subject.setMajors(selectedMajors);
+                subjectRepository.create(subject);
+                showSuccessAlert("Subject created successfully");
             }
             close();
         } catch (SQLException e) {
-            showAlert("Error", "An error occurred: " + e.getMessage());
-            System.err.println(e.getMessage());
+            System.err.println("SQL Error: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Error", "Database error: " + e.getMessage());
         }
-    }
-
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 
     @FXML
@@ -89,19 +135,36 @@ public class SubjectFormController implements Initializable {
     }
 
     private void close() {
-        ((Stage) nameField.getScene().getWindow()).close();
+        Stage stage = (Stage) nameField.getScene().getWindow();
+        stage.close();
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Load majors into ComboBox
-        MajorRepository majorRepository = new MajorRepository();
+    private void loadAllMajors() {
         try {
             List<Major> majors = majorRepository.getAll();
-            majorComboBox.getItems().addAll(majors);
+            majorListView.getItems().clear();
+            majorSelectionMap.clear();
+            majorListView.getItems().addAll(majors);
+            System.out.println("Loaded " + majors.size() + " majors into ListView");
         } catch (SQLException e) {
+            System.err.println("Error loading majors: " + e.getMessage());
             showAlert("Error", "Could not load majors: " + e.getMessage());
-            System.err.println(e.getMessage());
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccessAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

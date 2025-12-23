@@ -1,6 +1,9 @@
 package com.ensa.v2school.sm.Models;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -9,5 +12,10 @@ import lombok.*;
 public class Subject {
     private int id;
     private String name;
-    private Major major;
+    private List<Major> majors = new ArrayList<>();
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
 }

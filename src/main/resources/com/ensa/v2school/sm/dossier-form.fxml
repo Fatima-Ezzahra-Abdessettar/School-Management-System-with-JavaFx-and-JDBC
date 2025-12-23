@@ -1,43 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.ensa.v2school.sm.Controllers.DossierFormController">
+<AnchorPane prefHeight="202.0" prefWidth="364.0" stylesheets="@/dossier-form.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.DossierFormController">
 
-    <VBox spacing="16"
-          AnchorPane.topAnchor="0"
-          AnchorPane.bottomAnchor="0"
-          AnchorPane.leftAnchor="0"
-          AnchorPane.rightAnchor="0">
+    <VBox prefHeight="202.0" prefWidth="364.0" spacing="16" AnchorPane.bottomAnchor="-25.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
 
         <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
+            <Insets bottom="20" left="20" right="20" top="20" />
         </padding>
 
-        <Label text="Dossier Administratif" style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+        <Label styleClass="form-title" text="Dossier Administratif" />
 
         <GridPane hgap="10" vgap="12">
             <columnConstraints>
-                <ColumnConstraints halignment="RIGHT" minWidth="140"/>
-                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS"/>
+                <ColumnConstraints halignment="RIGHT" minWidth="140" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" />
             </columnConstraints>
 
-            <Label text="Numéro d'inscription:"/>
-            <TextField fx:id="numeroInscriptionField" GridPane.columnIndex="1" editable="false"/>
+            <Label text="Numéro d'inscription:" />
+            <TextField fx:id="numeroInscriptionField" editable="false" GridPane.columnIndex="1" />
 
-            <Label text="Date de création:" GridPane.rowIndex="1"/>
-            <DatePicker fx:id="dateCreationPicker"
-                        GridPane.rowIndex="1"
-                        GridPane.columnIndex="1"/>
+            <Label text="Date de création:" GridPane.rowIndex="1" />
+            <DatePicker fx:id="dateCreationPicker" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button text="Cancel" onAction="#handleCancel"/>
-            <Button text="Save" fx:id="saveBtn" onAction="#handleSave"/>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button onAction="#handleCancel" text="Cancel" />
+            <Button fx:id="saveBtn" onAction="#handleSave" text="Save" />
         </HBox>
 
     </VBox>

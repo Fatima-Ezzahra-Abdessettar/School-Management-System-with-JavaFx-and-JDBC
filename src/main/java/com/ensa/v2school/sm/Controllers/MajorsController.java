@@ -63,14 +63,12 @@ public class MajorsController implements Initializable {
         System.out.println("TableView: " + (TableView != null ? "OK" : "NULL"));
         System.out.println("MajorRepository: " + (majorRepository != null ? "OK" : "NULL"));
 
-        // Set up the columns to match Major properties
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("majorName"));
         descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 
-        // Set up the actions column with "View Details" button
         actionsCol.setCellFactory(param -> new TableCell<>() {
-            private final Button viewDetailsBtn = new Button("details");
+            private final Button viewDetailsBtn = new Button("view details");
 
             {
                 viewDetailsBtn.setOnAction(event -> {
@@ -221,27 +219,40 @@ public class MajorsController implements Initializable {
         Major selected = TableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("Error", "Select a major first", "");
+            return;
         }
-        else {
+
+        try {
+            // Check if major has students enrolled
+            if (majorRepository.hasStudents(selected.getId())) {
+                Alert warningAlert = new Alert(Alert.AlertType.WARNING);
+                warningAlert.setTitle("Cannot Delete Major");
+                warningAlert.setHeaderText("Major Has Students");
+                warningAlert.setContentText("Cannot delete this major because there are students enrolled in it. " +
+                        "Please remove or reassign all students before deleting this major.");
+                warningAlert.showAndWait();
+                return;
+            }
+
+            // If no students, proceed with confirmation
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Delete Major");
             alert.setHeaderText("Delete Major");
             alert.setContentText("Are you sure you want to delete this major?");
             Optional<ButtonType> result = alert.showAndWait();
+
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                try {
-                    majorRepository.delete(selected);
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Success");
-                    successAlert.setHeaderText("Major successfully deleted!");
-                    successAlert.setContentText("Major successfully deleted!");
-                    successAlert.showAndWait();
-                    loadTableView();
-                } catch (SQLException e) {
-                    System.out.println(e.getMessage());
-                    showAlert("Database Error", "Error", "Could not delete major!");
-                }
+                majorRepository.delete(selected);
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Success");
+                successAlert.setHeaderText("Major successfully deleted!");
+                successAlert.setContentText("Major successfully deleted!");
+                successAlert.showAndWait();
+                loadTableView();
             }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            showAlert("Database Error", "Error", "Could not delete major: " + e.getMessage());
         }
     }
 }

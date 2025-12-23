@@ -32,17 +32,10 @@ public class AdminController implements Initializable {
             AnchorPane view = fxmlLoader.load();
             centerAnchor.getChildren().clear();
             centerAnchor.getChildren().add(view);
-
-            // Anchor all sides to 0
-            AnchorPane.setTopAnchor(view, 0.0);
-            AnchorPane.setLeftAnchor(view, 0.0);
-            AnchorPane.setRightAnchor(view, 0.0);
-            AnchorPane.setBottomAnchor(view, 0.0);
-
-            // Bind the view's preferred width to fill the centerAnchor
-            view.prefWidthProperty().bind(centerAnchor.widthProperty());
-            view.prefHeightProperty().bind(centerAnchor.heightProperty());
-
+            AnchorPane.setTopAnchor(view,0.0);
+            AnchorPane.setLeftAnchor(view,0.0);
+            AnchorPane.setRightAnchor(view,0.0);
+            AnchorPane.setBottomAnchor(view,0.0);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

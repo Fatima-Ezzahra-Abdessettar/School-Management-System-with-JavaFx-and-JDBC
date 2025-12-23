@@ -32,7 +32,12 @@ public class StudentRepository implements CRUD<Student, String> {
                 ps.setNull(4, Types.INTEGER);
             }
             ps.setFloat(5, student.getAverage());
-            ps.setInt(6, student.getMajor().getId());
+            // Ensure major is not null and has an ID
+            if (student.getMajor() != null) {
+                ps.setInt(6, student.getMajor().getId());
+            } else {
+                ps.setNull(6, Types.INTEGER);
+            }
 
             int rowsAffected = ps.executeUpdate();
 
@@ -63,7 +68,12 @@ public class StudentRepository implements CRUD<Student, String> {
                 ps.setNull(3, Types.INTEGER);
             }
             ps.setFloat(4, student.getAverage());
-            ps.setInt(5, student.getMajor().getId());
+            // Ensure major is not null and has an ID
+            if (student.getMajor() != null) {
+                ps.setInt(5, student.getMajor().getId());
+            } else {
+                ps.setNull(5, Types.INTEGER);
+            }
             ps.setString(6, student.getId());
 
             int rowsAffected = ps.executeUpdate();
@@ -120,10 +130,12 @@ public class StudentRepository implements CRUD<Student, String> {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                // *** ADJUSTED Major constructor: Added new ArrayList<>() for subjects ***
                 Major major = new Major(
                         rs.getInt("major_id"),
                         rs.getString("major_name"),
-                        rs.getString("major_description")
+                        rs.getString("major_description"),
+                        new ArrayList<>()
                 );
 
                 DossierAdministratif dossier = null;
@@ -183,10 +195,12 @@ public class StudentRepository implements CRUD<Student, String> {
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
+                // *** ADJUSTED Major constructor: Added new ArrayList<>() for subjects ***
                 Major major = new Major(
                         rs.getInt("major_id"),
                         rs.getString("major_name"),
-                        rs.getString("major_description")
+                        rs.getString("major_description"),
+                        new ArrayList<>()
                 );
 
                 DossierAdministratif dossier = null;
@@ -242,10 +256,12 @@ public class StudentRepository implements CRUD<Student, String> {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                // *** ADJUSTED Major constructor: Added new ArrayList<>() for subjects ***
                 Major major = new Major(
                         rs.getInt("major_id"),
                         rs.getString("major_name"),
-                        rs.getString("major_description")
+                        rs.getString("major_description"),
+                        new ArrayList<>()
                 );
 
                 DossierAdministratif dossier = null;
@@ -307,10 +323,12 @@ public class StudentRepository implements CRUD<Student, String> {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+                // *** ADJUSTED Major constructor: Added new ArrayList<>() for subjects ***
                 Major major = new Major(
                         rs.getInt("major_id"),
                         rs.getString("major_name"),
-                        rs.getString("major_description")
+                        rs.getString("major_description"),
+                        new ArrayList<>()
                 );
 
                 DossierAdministratif dossier = null;
@@ -346,6 +364,7 @@ public class StudentRepository implements CRUD<Student, String> {
     }
 
     public Optional<Student> getWithDetails(String id, UserRepository userRepo, MajorRepository majorRepo) throws SQLException {
+        // This 'get' call is now using the constructor that includes the List<Subject>
         Optional<Student> studentOpt = get(id);
 
         if (studentOpt.isPresent()) {
@@ -363,6 +382,10 @@ public class StudentRepository implements CRUD<Student, String> {
                     int majorId = rs.getInt("major_id");
 
                     userRepo.get(userId).ifPresent(student::setUser);
+
+                    // This call to majorRepo.get(majorId) will now return a Major object
+                    // that includes its associated List<Subject>, thanks to the corrections
+                    // made in MajorRepository.
                     majorRepo.get(majorId).ifPresent(student::setMajor);
                 }
             }

@@ -11,53 +11,125 @@ import java.util.Optional;
 
 public class SubjectRepository implements CRUD<Subject, Integer> {
 
-    private DataBaseConnection connection;
+    private final DataBaseConnection connection;
 
     public SubjectRepository() {
         this.connection = DataBaseConnection.getInstance();
     }
 
+    /**
+     * Helper method to retrieve the list of Majors associated with a given Subject ID.
+     */
+    private List<Major> getMajorsForSubject(Connection con, int subjectId) throws SQLException {
+        String sql = """
+            SELECT m.id, m.name, m.description
+            FROM majors m
+            JOIN major_subject ms ON m.id = ms.major_id
+            WHERE ms.subject_id = ?
+        """;
+
+        List<Major> majors = new ArrayList<>();
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, subjectId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                majors.add(new Major(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        new ArrayList<>()
+                ));
+            }
+        }
+        return majors;
+    }
+
+    /**
+     * Inserts major-subject links into the joining table (part of CREATE/UPDATE).
+     */
+    private void insertMajors(Connection con, Subject subject) throws SQLException {
+        if (subject.getMajors() == null || subject.getMajors().isEmpty()) return;
+
+        String sql = "INSERT INTO major_subject (major_id, subject_id) VALUES (?, ?)";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            for (Major m : subject.getMajors()) {
+                if (m.getId() > 0) {
+                    ps.setInt(1, m.getId());
+                    ps.setInt(2, subject.getId());
+                    ps.addBatch();
+                }
+            }
+            ps.executeBatch();
+        }
+    }
+
+    /**
+     * Deletes all major-subject links for a given subject ID (part of UPDATE/DELETE).
+     */
+    private void deleteMajors(Connection con, int subjectId) throws SQLException {
+        String sql = "DELETE FROM major_subject WHERE subject_id = ?";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, subjectId);
+            ps.executeUpdate();
+        }
+    }
+
     @Override
     public Subject create(Subject subject) throws SQLException {
-        String sql = "INSERT INTO subjects (name, major_id) VALUES (?, ?)";
+        String sql = "INSERT INTO subjects (name) VALUES (?)";
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, subject.getName());
-            ps.setInt(2, subject.getMajor().getId());
+            con.setAutoCommit(false);
 
+            ps.setString(1, subject.getName());
             int rowsAffected = ps.executeUpdate();
 
             if (rowsAffected > 0) {
-                ResultSet generatedKeys = ps.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    subject.setId(generatedKeys.getInt(1));
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) {
+                    subject.setId(keys.getInt(1));
                 }
+
+                insertMajors(con, subject);
+                con.commit();
                 return subject;
             }
-
+            con.rollback();
+            return null;
         } catch (SQLException e) {
             System.err.println("Error creating subject: " + e.getMessage());
             throw e;
         }
-
-        return null;
     }
 
+    @Override
     public Subject update(Subject subject) throws SQLException {
-        String sql = "UPDATE subjects SET name = ?, major_id = ? WHERE id = ?";
+        String sql = "UPDATE subjects SET name = ? WHERE id = ?";
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
+            con.setAutoCommit(false);
+
             ps.setString(1, subject.getName());
-            ps.setInt(2, subject.getMajor().getId());
-            ps.setInt(3, subject.getId());
-
+            ps.setInt(2, subject.getId());
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0 ? subject : null;
 
+            if (rowsAffected > 0) {
+                deleteMajors(con, subject.getId());
+                insertMajors(con, subject);
+
+                con.commit();
+                return subject;
+            }
+            con.rollback();
+            return null;
         } catch (SQLException e) {
             System.err.println("Error updating subject: " + e.getMessage());
             throw e;
@@ -71,10 +143,19 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
+            con.setAutoCommit(false);
+
+            deleteMajors(con, subject.getId());
+
             ps.setInt(1, subject.getId());
             int rowsAffected = ps.executeUpdate();
 
-            return rowsAffected > 0 ? subject : null;
+            if (rowsAffected > 0) {
+                con.commit();
+                return subject;
+            }
+            con.rollback();
+            return null;
 
         } catch (SQLException e) {
             System.err.println("Error deleting subject: " + e.getMessage());
@@ -84,17 +165,7 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
 
     @Override
     public Optional<Subject> get(Integer id) throws SQLException {
-        String sql = """
-            SELECT 
-                s.id,
-                s.name,
-                m.id AS major_id,
-                m.name AS major_name,
-                m.description AS major_description
-            FROM subjects s
-            JOIN majors m ON s.major_id = m.id
-            WHERE s.id = ?
-        """;
+        String sql = "SELECT id, name FROM subjects WHERE id = ?";
 
         try (Connection con = connection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -102,41 +173,23 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                Major major = new Major(
-                        rs.getInt("major_id"),
-                        rs.getString("major_name"),
-                        rs.getString("major_description")
-                );
-                Subject subject = new Subject(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        major
-                );
-                return Optional.of(subject);
-            }
+            if (!rs.next()) return Optional.empty();
 
+            Subject subject = new Subject();
+            subject.setId(rs.getInt("id"));
+            subject.setName(rs.getString("name"));
+            subject.setMajors(getMajorsForSubject(con, id));
+
+            return Optional.of(subject);
         } catch (SQLException e) {
             System.err.println("Error getting subject: " + e.getMessage());
             throw e;
         }
-
-        return Optional.empty();
     }
 
     @Override
     public List<Subject> getAll() throws SQLException {
-        String sql = """
-            SELECT 
-                s.id,
-                s.name,
-                m.id AS major_id,
-                m.name AS major_name,
-                m.description AS major_description
-            FROM subjects s
-            JOIN majors m ON s.major_id = m.id
-            ORDER BY s.id ASC
-        """;
+        String sql = "SELECT id, name FROM subjects ORDER BY id ASC";
 
         List<Subject> subjects = new ArrayList<>();
 
@@ -145,40 +198,35 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                Major major = new Major(
-                        rs.getInt("major_id"),
-                        rs.getString("major_name"),
-                        rs.getString("major_description")
-                );
-                Subject subject = new Subject(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        major
-                );
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
                 subjects.add(subject);
             }
 
-            return subjects;
+            for (Subject subject : subjects) {
+                subject.setMajors(getMajorsForSubject(con, subject.getId()));
+            }
 
         } catch (SQLException e) {
             System.err.println("Error getting all subjects: " + e.getMessage());
             throw e;
         }
+
+        return subjects;
     }
 
-    // Custom Methods
-    public List<Subject> findByMajor(int majorId) throws SQLException {
+    /**
+     * Retrieves all Subjects associated with a specific Major ID.
+     * FIXED: Now properly loads all majors for each subject, not just an empty list.
+     */
+    public List<Subject> findByMajorId(int majorId) throws SQLException {
         String sql = """
-            SELECT 
-                s.id,
-                s.name,
-                m.id AS major_id,
-                m.name AS major_name,
-                m.description AS major_description
+            SELECT s.id, s.name
             FROM subjects s
-            JOIN majors m ON s.major_id = m.id
-            WHERE s.major_id = ?
-            ORDER BY s.name ASC
+            JOIN major_subject ms ON s.id = ms.subject_id
+            WHERE ms.major_id = ?
+            ORDER BY s.id ASC
         """;
 
         List<Subject> subjects = new ArrayList<>();
@@ -190,39 +238,21 @@ public class SubjectRepository implements CRUD<Subject, Integer> {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Major major = new Major(
-                        rs.getInt("major_id"),
-                        rs.getString("major_name"),
-                        rs.getString("major_description")
-                );
-                Subject subject = new Subject(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        major
-                );
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
+
+                // CRITICAL FIX: Load the actual majors for each subject
+                subject.setMajors(getMajorsForSubject(con, subject.getId()));
+
                 subjects.add(subject);
             }
 
-            return subjects;
-
         } catch (SQLException e) {
-            System.err.println("Error finding subjects by major: " + e.getMessage());
+            System.err.println("Error finding subjects by major ID: " + e.getMessage());
             throw e;
         }
-    }
 
-    public int getCount() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM subjects";
-        try (Connection con = connection.getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting subjects count: " + e.getMessage());
-            throw e;
-        }
-        return 0;
+        return subjects;
     }
 }

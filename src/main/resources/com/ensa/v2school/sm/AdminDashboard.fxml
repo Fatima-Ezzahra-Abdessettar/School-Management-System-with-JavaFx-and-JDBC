@@ -7,10 +7,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="403.0" minWidth="830" prefWidth="830.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.AdminController" stylesheets="@/admin-sidebar.css">
+<BorderPane maxHeight="-Infinity" minHeight="-Infinity" minWidth="730" prefHeight="403.0" stylesheets="@/admin-sidebar.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ensa.v2school.sm.Controllers.AdminController">
     <left>
-        <AnchorPane fx:id="sideBar" prefHeight="400.0" minWidth="170.0"
-                    prefWidth="170.0" BorderPane.alignment="CENTER">
+        <AnchorPane fx:id="sideBar" minWidth="170.0" prefHeight="400.0" prefWidth="170.0" BorderPane.alignment="CENTER">
             <children>
                 <ImageView fitHeight="74.0" fitWidth="98.0" layoutX="38.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                     <image>
@@ -21,7 +20,7 @@
                 <Button layoutX="29.0" layoutY="174.0" mnemonicParsing="false" onAction="#handleStudents" prefHeight="25.0" prefWidth="91.0" text="Students" />
                 <Button layoutX="29.0" layoutY="218.0" mnemonicParsing="false" onAction="#handleMajors" prefHeight="25.0" prefWidth="91.0" text="Majors" />
                 <Button layoutX="29.0" layoutY="262.0" mnemonicParsing="false" onAction="#handleSubjects" prefHeight="25.0" prefWidth="91.0" text="Subjects" />
-                <Button layoutX="30.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="33.0" prefWidth="89.0" style="-fx-background-color: #a31818;" text="logout" textFill="WHITE" textAlignment="CENTER">
+                <Button layoutX="30.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="33.0" prefWidth="89.0" style="-fx-background-color: #a31818;" text="logout" textAlignment="CENTER" textFill="WHITE">
                     <font>
                         <Font name="MingLiU_HKSCS-ExtB" size="14.0" />
                     </font>
@@ -30,7 +29,6 @@
         </AnchorPane>
     </left>
     <center>
-        <AnchorPane fx:id="centerAnchor" prefHeight="402.0" minWidth="560.0"
-                    prefWidth="560.0" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER" />
+        <AnchorPane fx:id="centerAnchor" minWidth="640.0" prefHeight="403.0" prefWidth="606.0" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER" />
     </center>
 </BorderPane>
