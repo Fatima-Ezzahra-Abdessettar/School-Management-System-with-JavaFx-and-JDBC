@@ -2,6 +2,9 @@ package com.ensa.v2school.sm.Models;
 
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor
 @ToString
 @Getter
@@ -14,6 +17,7 @@ public class Student {
     private float average;
     private Major major;
     private DossierAdministratif dossierAdministratif;
+    private List<Subject> subjects = new ArrayList<>();
 
     // Constructor without DossierAdministratif
     public Student(String id, String firstName, String lastName, User user, float average, Major major) {

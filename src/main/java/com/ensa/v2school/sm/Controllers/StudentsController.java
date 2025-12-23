@@ -294,6 +294,48 @@ public class StudentsController implements Initializable {
             System.err.println(e.getMessage());
         }
     }
+    // Add this method to your StudentsController class
+
+    @FXML
+    public void handleEnroll() {
+        Student selected = TableView.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showAlert("No Selection", "Select a student first", "");
+            return;
+        }
+
+        if (selected.getMajor() == null) {
+            showAlert("Error", "Cannot Enroll", "This student has no major assigned. Please assign a major first.");
+            return;
+        }
+
+        try {
+            openEnrollForm(selected);
+        } catch (IOException e) {
+            System.err.println("Failed to open enroll form: " + e.getMessage());
+            showAlert("Error", "Cannot open form", "Error: " + e.getMessage());
+        }
+    }
+
+    private void openEnrollForm(Student student) throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/ensa/v2school/sm/EnrollStudent.fxml")
+        );
+
+        Parent root = loader.load();
+
+        EnrollFormController controller = loader.getController();
+        controller.setStudent(student);
+
+        Stage stage = new Stage();
+        stage.setTitle("Enroll Student in Subjects");
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+
+        loadTableView(); // Refresh after enrollment
+    }
 
 
 

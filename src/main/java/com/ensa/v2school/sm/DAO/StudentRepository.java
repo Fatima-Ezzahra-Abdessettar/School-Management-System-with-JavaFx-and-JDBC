@@ -3,6 +3,7 @@ package com.ensa.v2school.sm.DAO;
 import com.ensa.v2school.sm.Models.Major;
 import com.ensa.v2school.sm.Models.Student;
 import com.ensa.v2school.sm.Models.DossierAdministratif;
+import com.ensa.v2school.sm.Models.Subject;
 import com.ensa.v2school.sm.utils.DataBaseConnection;
 
 import java.sql.*;
@@ -449,4 +450,127 @@ public class StudentRepository implements CRUD<Student, String> {
 
         return result;
     }
+    /**
+     * Enrolls a student in multiple subjects (transactional)
+     * @param studentId The student ID
+     * @param subjectIds List of subject IDs to enroll in
+     * @throws SQLException if enrollment fails
+     */
+    public void enrollInSubjects(String studentId, List<Integer> subjectIds) throws SQLException {
+        String sql = "INSERT INTO student_subject (student_id, subject_id) VALUES (?, ?)";
+
+        try (Connection con = connection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            con.setAutoCommit(false); // Start transaction
+
+            try {
+                for (Integer subjectId : subjectIds) {
+                    ps.setString(1, studentId);
+                    ps.setInt(2, subjectId);
+                    ps.addBatch();
+                }
+
+                ps.executeBatch();
+                con.commit(); // Commit transaction
+                System.out.println("Successfully enrolled student " + studentId + " in " + subjectIds.size() + " subjects");
+
+            } catch (SQLException e) {
+                con.rollback(); // Rollback on error
+                System.err.println("Error enrolling student in subjects: " + e.getMessage());
+                throw e;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database connection error: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Gets all subjects a student is enrolled in
+     * @param studentId The student ID
+     * @return List of enrolled subjects
+     */
+    public List<Subject> getEnrolledSubjects(String studentId) throws SQLException {
+        String sql = """
+        SELECT s.id, s.name
+        FROM subjects s
+        JOIN student_subject ss ON s.id = ss.subject_id
+        WHERE ss.student_id = ?
+        ORDER BY s.name
+    """;
+
+        List<Subject> subjects = new ArrayList<>();
+
+        try (Connection con = connection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Subject subject = new Subject();
+                    subject.setId(rs.getInt("id"));
+                    subject.setName(rs.getString("name"));
+                    subject.setMajors(new ArrayList<>()); // Empty for now
+                    subjects.add(subject);
+                }
+            }
+        }
+
+        return subjects;
+    }
+
+    /**
+     * Removes a student's enrollment from specific subjects
+     * @param studentId The student ID
+     * @param subjectIds List of subject IDs to unenroll from
+     */
+    public void unenrollFromSubjects(String studentId, List<Integer> subjectIds) throws SQLException {
+        String sql = "DELETE FROM student_subject WHERE student_id = ? AND subject_id = ?";
+
+        try (Connection con = connection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            con.setAutoCommit(false);
+
+            try {
+                for (Integer subjectId : subjectIds) {
+                    ps.setString(1, studentId);
+                    ps.setInt(2, subjectId);
+                    ps.addBatch();
+                }
+
+                ps.executeBatch();
+                con.commit();
+
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Checks if a student is already enrolled in a subject
+     */
+    public boolean isEnrolledInSubject(String studentId, int subjectId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM student_subject WHERE student_id = ? AND subject_id = ?";
+
+        try (Connection con = connection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentId);
+            ps.setInt(2, subjectId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+
+        return false;
+    }
+
 }
