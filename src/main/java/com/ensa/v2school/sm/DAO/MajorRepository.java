@@ -46,7 +46,6 @@ public class MajorRepository implements CRUD<Major, Integer> {
             ps.setInt(1, majorId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // Note: We don't load the List<Major> inside Subject here to avoid infinite recursion/deep loading
                     Subject subject = new Subject(
                             rs.getInt("id"),
                             rs.getString("name"),
@@ -55,6 +54,9 @@ public class MajorRepository implements CRUD<Major, Integer> {
                     subjects.add(subject);
                 }
             }
+        }catch (SQLException e){
+            System.err.println(e.getMessage());
+            throw e;
         }
         return subjects;
     }
