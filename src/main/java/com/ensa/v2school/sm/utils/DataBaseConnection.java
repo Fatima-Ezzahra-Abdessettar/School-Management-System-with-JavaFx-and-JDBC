@@ -6,29 +6,29 @@ import java.sql.SQLException;
 
 public class DataBaseConnection {
     private static DataBaseConnection instance;
-    private static final String url="jdbc:mysql://localhost:3306/school_management";
-    private static final String user="root";
-    private static final String password="mamapapa123";
+    private final String url="jdbc:mysql://localhost:3306/school_management";
+    private final String user="root";
+    private final String password="mamapapa123";
     private Connection connection;
-    private DataBaseConnection(String url, String user, String password) {
+    private DataBaseConnection() {
         try{
             connection = DriverManager.getConnection(url,user,password);
-            if (connection != null && !connection.isClosed()) {
-                System.out.println("Connected to the database successfully!");
-            }
+
         } catch (SQLException e) {
             System.err.println("Database connection failed!");
             throw new RuntimeException(e);
         }
     }
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
-    }
-    public static synchronized DataBaseConnection getInstance() {
-        if (instance == null) {
-            return new DataBaseConnection(url, user, password);
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(url, user, password);
         }
-        else {
-        return instance; }
+        return connection;
+    }
+    public static DataBaseConnection getInstance() {
+        if (instance == null) {
+            instance = new DataBaseConnection();
+        }
+        return instance;
     }
 }
