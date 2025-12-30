@@ -9,7 +9,7 @@ public class DataBaseConnection {
     private static final String url="jdbc:mysql://localhost:3306/school_management";
     private static final String user="root";
     private static final String password="mamapapa123";
-    Connection connection;
+    private Connection connection;
     private DataBaseConnection(String url, String user, String password) {
         try{
             connection = DriverManager.getConnection(url,user,password);
