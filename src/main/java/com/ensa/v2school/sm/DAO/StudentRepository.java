@@ -42,16 +42,15 @@ public class StudentRepository implements CRUD<Student, String> {
 
             int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                return student;
+            if (rowsAffected == 0) {
+                throw new SQLException("Student not created");
             }
+            return student;
 
         } catch (SQLException e) {
             System.err.println("Error creating student: " + e.getMessage());
             throw e;
         }
-
-        return null;
     }
 
     @Override
@@ -78,7 +77,10 @@ public class StudentRepository implements CRUD<Student, String> {
             ps.setString(6, student.getId());
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0 ? student : null;
+            if (rowsAffected == 0) {
+                throw new SQLException("Student not updated");
+            }
+            return student;
 
         } catch (SQLException e) {
             System.err.println("Error updating student: " + e.getMessage());
@@ -96,7 +98,10 @@ public class StudentRepository implements CRUD<Student, String> {
             ps.setString(1, student.getId());
             int rowsAffected = ps.executeUpdate();
 
-            return rowsAffected > 0 ? student : null;
+            if (rowsAffected == 0) {
+                throw new SQLException("Student not deleted");
+            }
+            return student;
 
         } catch (SQLException e) {
             System.err.println("Error deleting student: " + e.getMessage());
@@ -383,10 +388,6 @@ public class StudentRepository implements CRUD<Student, String> {
                     int majorId = rs.getInt("major_id");
 
                     userRepo.get(userId).ifPresent(student::setUser);
-
-                    // This call to majorRepo.get(majorId) will now return a Major object
-                    // that includes its associated List<Subject>, thanks to the corrections
-                    // made in MajorRepository.
                     majorRepo.get(majorId).ifPresent(student::setMajor);
                 }
             }
