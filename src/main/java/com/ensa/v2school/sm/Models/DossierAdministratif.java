@@ -13,5 +13,4 @@ public class DossierAdministratif {
     private String numeroInscription;
     private LocalDate dateCreation;
     private String eleveId; // Foreign key to Student
-    private Student student; // Optional: for when you need the full student object
 }

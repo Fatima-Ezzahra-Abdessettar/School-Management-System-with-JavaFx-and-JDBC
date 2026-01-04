@@ -50,7 +50,7 @@ public class StudentRepository implements CRUD<Student, String> {
         } catch (SQLException e) {
             System.err.println("Error creating student: " + e.getMessage());
             throw e;
-        }
+        } // normalement ca sert a rien had le catch, 7it en tt cas l erreur ghadi t throwa no matter what, unless we wanna change its type for example
     }
 
     @Override
@@ -107,7 +107,7 @@ public class StudentRepository implements CRUD<Student, String> {
             System.err.println("Error deleting student: " + e.getMessage());
             throw e;
         }
-    }
+    } // this should be delete by id normalement :D
 
     @Override
     public Optional<Student> get(String id) throws SQLException {
@@ -150,8 +150,7 @@ public class StudentRepository implements CRUD<Student, String> {
                             rs.getInt("dossier_id"),
                             rs.getString("numero_inscription"),
                             rs.getDate("date_creation").toLocalDate(),
-                            rs.getString("id"),
-                            null
+                            rs.getString("id")
                     );
                 }
 
@@ -214,8 +213,7 @@ public class StudentRepository implements CRUD<Student, String> {
                             rs.getInt("dossier_id"),
                             rs.getString("numero_inscription"),
                             rs.getDate("date_creation").toLocalDate(),
-                            rs.getString("id"),
-                            null
+                            rs.getString("id")
                     );
                 }
 
@@ -283,8 +281,7 @@ public class StudentRepository implements CRUD<Student, String> {
                             rs.getInt("dossier_id"),
                             rs.getString("numero_inscription"),
                             rs.getDate("date_creation").toLocalDate(),
-                            rs.getString("id"),
-                            null
+                            rs.getString("id")
                     );
                 }
 

@@ -173,8 +173,6 @@ public class DossierAdministratifRepository implements CRUD<DossierAdministratif
                 rs.getInt("id"),
                 rs.getString("numero_inscription"),
                 rs.getDate("date_creation").toLocalDate(),
-                rs.getString("eleve_id"),
-                null
-        );
+                rs.getString("eleve_id"));
     }
 }
